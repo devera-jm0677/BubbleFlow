@@ -1,0 +1,212 @@
+:root {
+    --primary: #0d6efd;
+    --primary-light: #e8f4ff;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa, #e8f4ff);
+    min-height: 100vh;
+}
+
+/* Background bubbles */
+.bubble {
+    position: fixed;
+    border-radius: 50%;
+    background: var(--primary-light);
+    animation: float 20s infinite;
+    z-index: -1;
+}
+
+@keyframes float {
+    50% { transform: translateY(-20px); }
+}
+
+/* Cards */
+.dashboard-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+}
+
+/* ===============================
+   DASHBOARD CARDS – ONE ROW
+================================ */
+
+.dashboard-summary {
+  display: flex;
+  gap: 16px;
+  flex-wrap: nowrap;      /* ❗ isang hilera lang */
+}
+
+.dashboard-summary .dashboard-card {
+  flex: 1;                /* pantay-pantay ang lapad */
+  min-width: 0;           /* para hindi mag-overflow */
+}
+
+
+/* SERVICE CARD FIXES */
+.service-option {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    border: 2px solid #e9ecef;
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: .3s ease;
+    background: #fff;
+    text-align: center;
+    position: relative;
+}
+
+/* Hide checkbox */
+.service-option input[type="checkbox"] {
+    display: none;
+}
+
+.service-option:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.service-option.selected {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+/* Equal content spacing */
+.service-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13,110,253,.1);
+    border-radius: 16px;
+}
+
+.service-option h5 {
+    min-height: 2.5rem;
+}
+
+.service-description {
+    min-height: 3.2rem;
+    font-size: .85rem;
+    color: #6c757d;
+}
+
+/* Price */
+.price-tag-small {
+    background: rgba(13,110,253,.1);
+    color: var(--primary);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-weight: 600;
+}
+
+.price-tag {
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+/* Welcome */
+.welcome-section {
+    background: linear-gradient(135deg, rgba(13,110,253,.1), #fff);
+    border-radius: 24px;
+    padding: 2.5rem;
+}
+/* =========================================================
+   READY STATUS – USER DASHBOARD
+========================================================= */
+
+/* READY number color */
+.text-ready {
+  color: #0e7490 !important;
+}
+
+/* READY dashboard card accent */
+.ready-card {
+  background: linear-gradient(
+    135deg,
+    #ecfeff,
+    #ffffff
+  );
+}
+
+/* STATUS BADGE BASE */
+.status-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* STATUS COLORS */
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-in-progress {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.status-ready {
+  background: #ecfeff;
+  color: #0e7490;
+}
+
+.status-completed {
+  background: #dcfce7;
+  color: #166534;
+}
+/* =========================================
+   DASHBOARD SUMMARY – FIXED ONE ROW (NO GAP)
+========================================= */
+
+.dashboard-summary {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
+
+/* bawat card */
+.dashboard-summary .dashboard-card {
+  flex: 1;                  /* pantay lahat */
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px 10px;       /* 👈 paliit */
+  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+  min-width: 0;             /* IMPORTANT: tanggal ghost space */
+}
+
+/* number size */
+.dashboard-summary .fs-2 {
+  font-size: 1.6rem !important;
+}
+
+/* READY color */
+.text-ready {
+  color: #0e7490 !important;
+}
+.logout-btn {
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.logout-btn:hover {
+  background: var(--primary);
+  color: #fff;
+}

@@ -1,0 +1,60 @@
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #212529;
+    --bg-light: #f8f9fa;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--bg-light);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.auth-card {
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+}
+
+.input-group-text {
+    background: transparent;
+    border-right: none;
+    color: #6c757d;
+}
+
+.form-control {
+    border-left: none;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.decoration-blob {
+    position: fixed;
+    z-index: 1;
+    filter: blur(60px);
+    border-radius: 50%;
+    background: var(--primary-color);
+    opacity: 0.1;
+}
+
+.btn-login {
+    height: 3.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.demo-box {
+    background-color: #f1f3f5;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}

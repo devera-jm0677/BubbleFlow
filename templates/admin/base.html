@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BubbleFlow Admin</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      💧 BubbleFlow
+    </div>
+
+    <nav>
+      <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('manage_orders') }}">Orders</a>
+      <a href="{{ url_for('manage_services') }}">Services</a>
+    </nav>
+
+    <a class="logout" href="{{ url_for('logout') }}">Logout</a>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+
+</div>
+
+</body>
+</html>

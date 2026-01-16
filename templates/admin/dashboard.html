@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - BubbleFlow</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin_dashboard.css') }}">
+
+  <!-- Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="dashboard-page">
+
+<!-- NAVBAR -->
+<nav class="admin-navbar">
+  <div class="nav-left">
+    <div class="logo"><i class="fas fa-droplet"></i> BubbleFlow</div>
+  </div>
+
+  <div class="nav-right">
+    <div class="admin-info">
+      <strong>{{ session['user']['name'] }}</strong>
+      <span>| Admin</span>
+    </div>
+
+    <a href="{{ url_for('admin_dashboard') }}" class="nav-link active">
+      <i class="fas fa-chart-line"></i> Dashboard
+    </a>
+    <a href="{{ url_for('manage_orders') }}" class="nav-link">
+      <i class="fas fa-box"></i> Orders
+    </a>
+    <a href="{{ url_for('manage_services') }}" class="nav-link">
+      <i class="fas fa-soap"></i> Services
+    </a>
+    <a href="javascript:void(0)" class="logout-btn" onclick="confirmLogout()">
+      Logout
+    </a>
+  </div>
+</nav>
+
+<!-- BACKGROUND BUBBLES -->
+<div class="bubble" style="width:140px;height:140px;top:12%;right:5%"></div>
+<div class="bubble" style="width:100px;height:100px;top:20%;right:17%"></div>
+<div class="bubble" style="width:50px;height:55px;top:30%;right:12%"></div>
+<div class="bubble" style="width:200px;height:200px;bottom:15%;left:10%"></div>
+<div class="bubble" style="width:150px;height:150px;bottom:10%;right:20%"></div>
+
+<!-- WELCOME -->
+<div class="admin-welcome">
+  <h1>Welcome, <span>{{ session['user']['name'] }}</span>!</h1>
+  <p>Manage and monitor laundry operations from your admin dashboard.</p>
+</div>
+
+<main class="admin-content">
+
+<!-- =====================
+     SUMMARY CARDS
+===================== -->
+<div class="dashboard-summary">
+
+  <div class="dashboard-card total">
+    <div class="card-content">
+      <div>
+        <div class="card-number text-primary">{{ total_orders }}</div>
+        <div class="card-label">Total Orders</div>
+      </div>
+      <div class="card-icon bg-primary"><i class="fas fa-box"></i></div>
+    </div>
+  </div>
+
+  <div class="dashboard-card pending">
+    <div class="card-content">
+      <div>
+        <div class="card-number text-warning">{{ pending_orders }}</div>
+        <div class="card-label">Pending</div>
+      </div>
+      <div class="card-icon bg-warning"><i class="fas fa-hourglass-half"></i></div>
+    </div>
+  </div>
+
+  <div class="dashboard-card in-progress">
+    <div class="card-content">
+      <div>
+        <div class="card-number text-info">{{ in_progress_orders }}</div>
+        <div class="card-label">In Progress</div>
+      </div>
+      <div class="card-icon bg-info"><i class="fas fa-spinner"></i></div>
+    </div>
+  </div>
+
+  <div class="dashboard-card ready">
+    <div class="card-content">
+      <div>
+        <div class="card-number text-ready">{{ ready_orders }}</div>
+        <div class="card-label">Ready</div>
+      </div>
+      <div class="card-icon bg-ready"><i class="fas fa-check-circle"></i></div>
+    </div>
+  </div>
+
+  <div class="dashboard-card completed">
+    <div class="card-content">
+      <div>
+        <div class="card-number text-success">{{ completed_orders }}</div>
+        <div class="card-label">Completed</div>
+      </div>
+      <div class="card-icon bg-success"><i class="fas fa-clipboard-check"></i></div>
+    </div>
+  </div>
+
+</div>
+
+
+
+<!-- =====================
+     ANALYTICS
+===================== -->
+<div class="analytics-grid">
+
+  <div class="analytics-card">
+    <div class="analytics-header">
+      <h4>Orders Per Day</h4>
+    </div>
+
+    <canvas id="ordersChart"></canvas>
+  </div>
+
+  <div class="analytics-card">
+    <div class="analytics-header">
+      <h4>Service Usage</h4>
+    </div>
+
+    <canvas id="servicesChart"></canvas>
+  </div>
+
+</div>
+<!-- =====================
+     REVENUE CARDS
+===================== -->
+<div class="dashboard-revenue">
+
+  <div class="dashboard-card revenue compact">
+    <div class="card-left">
+      <i class="fas fa-peso-sign"></i>
+      <span class="line revenue"></span>
+    </div>
+    <div class="card-right">
+      <label>Revenue Today</label>
+      <strong>₱{{ "%.2f"|format(revenue_today) }}</strong>
+    </div>
+  </div>
+
+  <div class="dashboard-card revenue compact">
+    <div class="card-left">
+      <i class="fas fa-chart-line"></i>
+      <span class="line revenue"></span>
+    </div>
+    <div class="card-right">
+      <label>This Month</label>
+      <strong>₱{{ "%.2f"|format(revenue_month) }}</strong>
+    </div>
+  </div>
+
+</div>
+<!-- =====================
+     REPORTS
+===================== -->
+<h2>Report Generation</h2><br>
+
+<div class="report-summary">
+
+  <div class="report-card"
+       onclick="confirmReport(
+         'Generate Sales Report?',
+         'This will download a CSV file of completed orders.',
+         '{{ url_for('sales_report') }}'
+       )">
+    <h4>Sales Report</h4>
+    <p>Completed Orders</p>
+  </div>
+
+  <div class="report-card"
+       onclick="confirmReport(
+         'Generate Service Usage Report?',
+         'This will download a CSV file of service usage.',
+         '{{ url_for('service_usage_report') }}'
+       )">
+    <h4>Service Usage</h4>
+    <p>Most Used Services</p>
+  </div>
+
+  <div class="report-card"
+       onclick="confirmReport(
+         'Download Bulk Receipts?',
+         'This will download all completed receipts.',
+         '{{ url_for('bulk_receipts') }}'
+       )">
+    <h4>Bulk Receipts</h4>
+    <p>Completed Orders</p>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="profile-footer">
+  <a href="{{ url_for('user_dashboard') }}" class="profile-footer-brand">
+    <i class="fas fa-droplet"></i> BubbleFlow
+  </a>
+  <p>© 2024 BubbleFlow. Fresh, Clean, Simple.</p>
+</footer>
+
+</main>
+
+<!-- =====================
+     CHART SCRIPTS
+===================== -->
+<script>
+new Chart(document.getElementById('ordersChart'), {
+  type: 'line',
+  data: {
+    labels: {{ chart_days | safe }},
+    datasets: [{
+      data: {{ chart_orders | safe }},
+      borderColor: '#0d6efd',
+      backgroundColor: 'rgba(13,110,253,0.2)',
+      fill: true,
+      tension: 0.4
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } }
+  }
+});
+</script>
+
+<script>
+new Chart(document.getElementById('servicesChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ chart_services | safe }},
+    datasets: [{
+      data: {{ chart_counts | safe }},
+      backgroundColor: '#0d6efd',
+      borderRadius: 8
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } }
+  }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function confirmReport(title, text, url) {
+  Swal.fire({
+    title,
+    text,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#0d6efd',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Proceed'
+  }).then((result) => {
+    if (result.isConfirmed) window.location.href = url;
+  });
+}
+</script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function confirmLogout() {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will be logged out.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Yes, logout',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = "{{ url_for('logout') }}";
+    }
+  });
+}
+</script>
+</body>
+
+</body>
+</html>

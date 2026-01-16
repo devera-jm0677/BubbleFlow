@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Services - BubbleFlow</title>
+
+    <!-- Fonts & Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Admin CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='admin.css') }}"
+    />
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+
+  <body>
+    <!-- =====================
+     NAVBAR
+===================== -->
+    <nav class="admin-navbar">
+      <div class="nav-left">
+        <div class="logo"><i class="fas fa-droplet"></i> BubbleFlow</div>
+      </div>
+
+      <div class="nav-right">
+        <div class="admin-info">
+          <strong>{{ session['user']['name'] }}</strong>
+          <span>| Admin</span>
+        </div>
+
+        <a href="{{ url_for('admin_dashboard') }}" class="nav-link">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+
+        <a href="{{ url_for('manage_orders') }}" class="nav-link">
+          <i class="fas fa-box"></i> Orders
+        </a>
+
+        <a href="{{ url_for('manage_services') }}" class="nav-link active">
+          <i class="fas fa-soap"></i> Services
+        </a>
+
+        <a
+          href="javascript:void(0)"
+          class="logout-btn"
+          onclick="confirmLogout()"
+        >
+          Logout
+        </a>
+      </div>
+    </nav>
+
+    <!-- =====================
+     CONTENT
+===================== -->
+    <main class="admin-content">
+      <div class="table-card">
+        <div class="services-header">
+          <h1>Services</h1>
+          <button class="btn-action edit" onclick="toggleForm()">
+            <i class="fas fa-plus"></i> Add Service
+          </button>
+        </div>
+
+        <table class="services-table">
+          <thead>
+            <tr>
+              <th class="cell-service">Service</th>
+              <th class="cell-price">Price / kg</th>
+              <th class="cell-status">Status</th>
+              <th class="cell-used">Used</th>
+              <th class="cell-actions">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for s in services %}
+            <tr>
+              <td class="cell-service">{{ s.service_name }}</td>
+
+              <td class="cell-price">₱{{ "%.2f"|format(s.price_per_kg) }}</td>
+
+              <td class="cell-status">
+                <span class="status-pill {{ s.status }}"> {{ s.status }} </span>
+              </td>
+
+              <td class="cell-used">{{ s.used_count }}</td>
+
+              <td>
+                <div class="actions">
+                  <!-- EDIT -->
+                  <button
+                    class="btn-action edit"
+                    onclick="editService('{{ s.service_id }}',
+                                      '{{ s.service_name }}',
+                                      '{{ s.price_per_kg }}',
+                                      '{{ s.status }}')"
+                  >
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+
+                  {% if s.status == 'active' %} {% if s.used_count > 0 %}
+                  <button class="btn-action disabled" disabled>
+                    <i class="fas fa-lock"></i> In Use
+                  </button>
+                  {% else %}
+                  <button
+                    class="btn-action warning"
+                    onclick="confirmDeactivate('{{ s.service_id }}','{{ s.service_name }}')"
+                  >
+                    <i class="fas fa-ban"></i> Deactivate
+                  </button>
+
+                  <button
+                    class="btn-action danger"
+                    onclick="confirmDelete('{{ s.service_id }}','{{ s.service_name }}')"
+                  >
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                  {% endif %} {% else %}
+                  <button
+                    class="btn-action success"
+                    onclick="confirmReactivate('{{ s.service_id }}','{{ s.service_name }}')"
+                  >
+                    <i class="fas fa-check"></i> Reactivate
+                  </button>
+
+                  <button
+                    class="btn-action danger"
+                    onclick="confirmDelete('{{ s.service_id }}','{{ s.service_name }}')"
+                  >
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- =====================
+       SLIDE FORM
+  ===================== -->
+      <div class="service-form-wrapper" id="serviceFormWrapper">
+        <div class="service-form-card">
+          <h2>Add / Edit Service</h2>
+
+          <form method="POST">
+            <input type="hidden" name="service_id" id="service_id" />
+
+            <div class="form-grid">
+              <div>
+                <label>Service Name</label>
+                <input
+                  type="text"
+                  name="service_name"
+                  id="service_name"
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Price per kg</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="price_per_kg"
+                  id="price_per_kg"
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Status</label>
+                <select name="status" id="status">
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-outline" onclick="toggleForm()">
+                Cancel
+              </button>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Save Service
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- =====================
+     SCRIPTS
+===================== -->
+    <script>
+      function toggleForm() {
+        document.getElementById("serviceFormWrapper").classList.toggle("show");
+      }
+
+      function editService(id, name, price, status) {
+        toggleForm();
+        document.getElementById("service_id").value = id;
+        document.getElementById("service_name").value = name;
+        document.getElementById("price_per_kg").value = price;
+        document.getElementById("status").value = status;
+      }
+
+      function confirmDeactivate(id, name) {
+        Swal.fire({
+          title: "Deactivate Service?",
+          html: `<strong>${name}</strong><br>This will hide the service.`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Deactivate",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = `/admin/services/delete/${id}`;
+          }
+        });
+      }
+
+      function confirmReactivate(id, name) {
+        Swal.fire({
+          title: "Reactivate Service?",
+          icon: "question",
+          showCancelButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = `/admin/services/reactivate/${id}`;
+          }
+        });
+      }
+
+      function confirmDelete(id, name) {
+        Swal.fire({
+          title: "Delete this service?",
+          html: `
+      <span style="color:#ef4444;font-weight:600">
+        This action is permanent and cannot be undone.
+      </span>
+    `,
+          icon: "warning",
+          showCancelButton: true,
+          cancelButtonText: "Cancel",
+          confirmButtonText: "Yes, delete",
+          confirmButtonColor: "#ef4444",
+          reverseButtons: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = `/admin/services/hard-delete/${id}`;
+          }
+        });
+      }
+
+      function confirmLogout() {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You will be logged out.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#dc3545",
+          cancelButtonColor: "#6c757d",
+          confirmButtonText: "Yes, logout",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "{{ url_for('logout') }}";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

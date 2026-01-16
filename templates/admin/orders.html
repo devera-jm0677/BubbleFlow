@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Orders - BubbleFlow</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/admin.css') }}">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="admin-navbar">
+  <div class="nav-left">
+    <div class="logo"><i class="fas fa-droplet"></i> BubbleFlow</div>
+  </div>
+
+  <div class="nav-right">
+    <div class="admin-info">
+      <strong>{{ session['user']['name'] }}</strong>
+      <span>| Admin</span>
+    </div>
+
+    <a href="{{ url_for('admin_dashboard') }}" class="nav-link">
+      <i class="fas fa-chart-line"></i> Dashboard
+    </a>
+    <a href="{{ url_for('manage_orders') }}" class="nav-link active">
+      <i class="fas fa-box"></i> Orders
+    </a>
+    <a href="{{ url_for('manage_services') }}" class="nav-link">
+      <i class="fas fa-soap"></i> Services
+    </a>
+    <a href="javascript:void(0)" class="logout-btn" onclick="confirmLogout()">
+      Logout
+    </a>
+  </div>
+</nav>
+
+<div class="bubble" style="width:140px;height:140px;top:12%;right:5%"></div>
+<div class="bubble" style="width:50px;height:50px;top:5%;right:15%"></div>
+<div class="bubble" style="width:100px;height:100px;top:20%;left:5%"></div>
+<!-- <div class="bubble" style="width:50px;height:55px;top:30%;right:12%"></div> -->
+<div class="bubble" style="width:200px;height:200px;bottom:15%;right:10%"></div>
+<div class="bubble" style="width:100px;height:100px;bottom:2%;left:8%"></div>
+<div class="bubble" style="width:50px;height:50px;bottom:2%;left:15%"></div>
+
+
+<main class="admin-content admin-orders-page">
+
+ <div class="summary-grid">
+  <div class="summary-card">
+    <h3>Orders Today</h3>
+    <p>{{ stats.total or 0 }}</p>
+  </div>
+
+  <div class="summary-card pending">
+    <h3>Pending</h3>
+    <p>{{ stats.pending or 0 }}</p>
+  </div>
+
+  <div class="summary-card">
+    <h3>In Progress</h3>
+    <p>{{ stats.in_progress or 0 }}</p>
+  </div>
+
+  <!-- ✅ READY -->
+  <div class="summary-card ready">
+    <h3>Ready</h3>
+    <p>{{ stats.ready or 0 }}</p>
+  </div>
+
+  <div class="summary-card completed">
+    <h3>Completed</h3>
+    <p>{{ stats.completed or 0 }}</p>
+  </div>
+</div>
+
+
+  <!-- ORDERS TABLE -->
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <!-- <th>Weight</th> -->
+          <th>Services</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      {% for o in orders %}
+      <tr>
+        <td class="order-id">
+          <strong>#{{ o.order_id }}</strong><br>
+          <small class="text-muted">
+            ORD-{{ "%04d"|format(o.order_id) }}
+          </small>
+        </td>
+        <td class="customer-cell">
+          <strong>{{ o.customer_name }}</strong><br>
+          <!-- <small class="text-muted">Customer</small> -->
+        </td>
+
+        <td class="date-cell">
+          {{ o.created_at.strftime('%b %d, %Y') }}<br>
+          <small class="text-muted">
+            {{ o.created_at.strftime('%I:%M %p') }}
+          </small>
+        </td>
+
+        <!-- <td>
+          <i class="fas fa-weight-hanging text-primary me-1"></i>
+          {{ o.weight }} kg
+        </td> -->
+
+        <td class="services-cell">
+          {% for s in o.services %}
+            <span class="service-pill">{{ s }}</span>
+          {% endfor %}
+        </td>
+
+        <td class="fw-bold text-primary">
+          ₱{{ "%.2f"|format(o.total_estimate) }}
+        </td>
+
+        <td class="status-cell">
+          <span class="status-{{ o.status|lower|replace(' ','-') }}">
+            {{ o.status }}
+          </span>
+        </td>
+
+        <td class="action-cell">
+          <form method="POST" class="update-form auto-save-form">
+            <input type="hidden" name="order_id" value="{{ o.order_id }}">
+            <select name="status" class="status-select">
+              <option {% if o.status=='Pending' %}selected{% endif %}>Pending</option>
+              <option {% if o.status=='In Progress' %}selected{% endif %}>In Progress</option>
+              <option {% if o.status=='Ready' %}selected{% endif %}>Ready</option>
+              <option {% if o.status=='Completed' %}selected{% endif %}>Completed</option>
+            </select>
+          </form>
+
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</main>
+<script>
+  document.querySelectorAll('.status-select').forEach(select => {
+    select.addEventListener('change', function () {
+      this.closest('form').submit();
+    });
+  });
+</script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function confirmLogout() {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will be logged out.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Yes, logout',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = "{{ url_for('logout') }}";
+    }
+  });
+}
+</script>
+</body>
+
+</body>
+</html>

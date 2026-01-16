@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BubbleFlow Receipt</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .receipt {
+      width: 280px; /* thermal-friendly */
+      margin: auto;
+      padding: 10px;
+    }
+
+    h2 {
+      text-align: center;
+      margin: 5px 0;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .divider {
+      border-top: 1px dashed #000;
+      margin: 8px 0;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 4px 0;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .small {
+      font-size: 11px;
+    }
+
+    .total {
+      font-size: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body onload="window.print()">
+
+<div class="receipt">
+
+  <h2>BubbleFlow</h2>
+  <p class="center small">Laundry Service Receipt</p>
+
+  <div class="divider"></div>
+
+  <div class="small">
+    <div>Order #: <strong>{{ order.order_code }}</strong></div>
+    <div>Date: {{ order.created_at.strftime('%b %d, %Y') }}</div>
+    <div>Time: {{ order.created_at.strftime('%I:%M %p') }}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="row">
+    <span>Weight</span>
+    <span>{{ order.weight }} kg</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="bold">Services</div>
+
+  {% for s in services %}
+    <div class="row">
+      <span>{{ s.service_name }}</span>
+      <span>₱{{ "%.2f"|format(s.price_per_kg * order.weight) }}</span>
+    </div>
+  {% endfor %}
+
+  <div class="divider"></div>
+
+  <div class="row total">
+    <span>Total</span>
+    <span>₱{{ "%.2f"|format(order.total_estimate) }}</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <p class="center small">
+    Please bring this receipt when picking up your laundry.
+  </p>
+
+  <p class="center small">
+    Thank you for choosing BubbleFlow!
+  </p>
+
+</div>
+
+</body>
+</html>

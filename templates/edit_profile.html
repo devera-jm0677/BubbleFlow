@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - BubbleFlow</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='edit_profile.css') }}">
+</head>
+<body class="edit-profile-body">
+
+    <!-- Background Bubbles -->
+    <div class="profile-bubble" style="width: 80px; height: 80px; left: 10%; top: 20%;"></div>
+    <div class="profile-bubble" style="width: 120px; height: 120px; right: 15%; top: 10%; animation-delay: 1s;"></div>
+    <div class="profile-bubble" style="width: 60px; height: 60px; left: 50%; top: 50%; animation-delay: 2s;"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light py-3 sticky-top edit-profile-nav">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold fs-3" href="{{ url_for('user_dashboard') }}">
+                <i class="fas fa-droplet text-primary me-2"></i> BubbleFlow
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <div>
+                    <div class="fw-bold">{{ session.user.name }}</div>
+                    <div class="text-muted small">Customer</div>
+                </div>
+                <div class="vr"></div>
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-link text-decoration-none text-dark">
+                    <i class="fas fa-home me-1"></i> Dashboard
+                </a>
+                <a href="{{ url_for('my_orders') }}" class="btn btn-link text-dark">
+                    <i class="fas fa-history me-1"></i> My Orders
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-primary rounded-pill px-4">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="profile-container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                
+                <!-- Page Header -->
+                <div class="profile-header-section fade-in-up">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div>
+                            <h1 class="fw-bold mb-2">Edit Profile</h1>
+                            <p class="lead text-muted">Update your account information</p>
+                        </div>
+                        <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-primary back-dashboard-btn">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Profile Card -->
+                <div class="profile-card fade-in-up delay-1">
+                    <!-- Profile Header -->
+                    <div class="profile-header-banner">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3 class="profile-user-name">{{ session.user.name }}</h3>
+                        <p class="profile-user-email">
+                            <i class="fas fa-envelope me-1"></i> {{ session.user.email }}
+                        </p>
+                    </div>
+                    
+                    <!-- Profile Form -->
+                    <div class="profile-content">
+                        <!-- Information Notice -->
+                        <div class="profile-info-card fade-in-up delay-2">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle fa-lg me-3"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Profile Settings</h6>
+                                    <p class="mb-0">
+                                        You can update your name and password below. Email cannot be changed.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form method="POST" action="{{ url_for('edit_profile') }}" id="profileForm">
+                            <!-- Name (Editable) -->
+                            <div class="profile-input-group fade-in-up delay-2">
+                                <label class="profile-form-label">Full Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+                                </div>
+                                <small class="text-muted">Enter your full name as you'd like it to appear.</small>
+                            </div>
+                            
+                            <!-- Email (Read-only) -->
+                            <div class="profile-input-group fade-in-up delay-3">
+                                <label class="profile-form-label">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                                </div>
+                                <small class="text-muted">Email cannot be changed for security reasons.</small>
+                            </div>
+                            
+                            <!-- Account Type -->
+                            <div class="profile-input-group fade-in-up delay-3">
+                                <label class="profile-form-label">Account Type</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-shield-halved"></i></span>
+                                    <input type="text" class="form-control" value="Customer" readonly>
+                                </div>
+                            </div>
+                            
+                            <!-- Member Since -->
+                            <div class="profile-input-group fade-in-up delay-4">
+                                <label class="profile-form-label">Member Since</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                    <input type="text" class="form-control" value="{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'Recent' }}" readonly>
+                                </div>
+                            </div>
+                            
+                            <!-- Password Change Section -->
+                            <div class="profile-password-section fade-in-up delay-4">
+                                <h5 class="fw-bold mb-4">Change Password</h5>
+                                
+                                <div class="profile-input-group">
+                                    <label class="profile-form-label">Current Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" name="current_password" id="currentPassword" class="form-control" placeholder="Enter current password">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('currentPassword', 'currentPasswordIcon')">
+                                            <i class="fas fa-eye" id="currentPasswordIcon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="profile-input-group">
+                                    <label class="profile-form-label">New Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                        <input type="password" name="new_password" id="newPassword" class="form-control" placeholder="Enter new password">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('newPassword', 'newPasswordIcon')">
+                                            <i class="fas fa-eye" id="newPasswordIcon"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">Password must be at least 6 characters.</small>
+                                </div>
+                                
+                                <div class="profile-input-group mb-4">
+                                    <label class="profile-form-label">Confirm New Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                        <input type="password" name="confirm_password" id="confirmPassword" class="form-control" placeholder="Confirm new password">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword', 'confirmPasswordIcon')">
+                                            <i class="fas fa-eye" id="confirmPasswordIcon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info profile-alert">
+                                    <div class="d-flex">
+                                        <i class="fas fa-lightbulb me-3 mt-1"></i>
+                                        <div>
+                                            <h6 class="fw-bold mb-2">Password Change Notes</h6>
+                                            <p class="mb-0">
+                                                Leave password fields blank if you don't want to change your password.
+                                                If changing password, you must enter your current password.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="profile-action-buttons fade-in-up delay-4">
+                                <a href="{{ url_for('user_dashboard') }}" class="btn profile-btn profile-btn-outline">
+                                    <i class="fas fa-times me-2"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn profile-btn profile-btn-primary">
+                                    <i class="fas fa-save me-2"></i> Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Statistics Section -->
+                <div class="profile-stats-container fade-in-up delay-1">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="profile-stat-card">
+                                <div class="profile-stat-value text-primary">
+                                    {% if user_stats %}{{ user_stats.total_orders }}{% else %}0{% endif %}
+                                </div>
+                                <div class="profile-stat-label">Total Orders</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="profile-stat-card">
+                                <div class="profile-stat-value text-warning">
+                                    {% if user_stats %}{{ user_stats.pending_orders }}{% else %}0{% endif %}
+                                </div>
+                                <div class="profile-stat-label">Pending Orders</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="profile-stat-card">
+                                <div class="profile-stat-value text-success">
+                                    {% if user_stats %}{{ user_stats.completed_orders }}{% else %}0{% endif %}
+                                </div>
+                                <div class="profile-stat-label">Completed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="profile-footer">
+        <div class="container">
+            <div class="profile-footer-content">
+                <a href="{{ url_for('user_dashboard') }}" class="profile-footer-brand">
+                    <i class="fas fa-droplet"></i> BubbleFlow
+                </a>
+                <p class="profile-footer-text mb-0">© 2024 BubbleFlow. Fresh, Clean, Simple.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Toggle password visibility
+        function togglePassword(fieldId, iconId) {
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById(iconId);
+            if (field.type === "password") {
+                field.type = "text";
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                field.type = "password";
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+        
+        // Form validation
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const currentPassword = document.getElementById('currentPassword').value;
+            
+            // If new password is entered, validate it
+            if (newPassword || confirmPassword || currentPassword) {
+                if (!currentPassword) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Current Password Required',
+                        text: 'Please enter your current password to change your password.',
+                        icon: 'warning',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Passwords Do Not Match',
+                        text: 'New password and confirmation password must match.',
+                        icon: 'error',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                    return;
+                }
+                
+                if (newPassword.length > 0 && newPassword.length < 6) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Password Too Short',
+                        text: 'Password must be at least 6 characters.',
+                        icon: 'error',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                    return;
+                }
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Saving...';
+        });
+        
+        // Initialize animations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation classes to elements
+            const animatedElements = document.querySelectorAll('.fade-in-up');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+            });
+            
+            // Trigger animations
+            setTimeout(() => {
+                animatedElements.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 300);
+        });
+    </script>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <script>
+        {% for category, message in messages %}
+        Swal.fire({
+            icon: '{{ "success" if category == "success" else "error" if category == "error" else "info" }}',
+            title: '{{ "Success" if category == "success" else "Notice" }}',
+            text: '{{ message }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+        {% endfor %}
+    </script>
+    {% endif %}
+    {% endwith %}
+</body>
+</html>
